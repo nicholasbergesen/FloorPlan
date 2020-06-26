@@ -5,8 +5,12 @@ using System.Drawing;
 using System.Drawing.Text;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Policy;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 
 namespace FloorPlanNet
 {
@@ -17,67 +21,94 @@ namespace FloorPlanNet
         private const string NotFloorPlan = "NotFloorPlan";
 
         private Network _curnetwork;
-        private long _curListingNumber;
-        private int _curImageId;
-        private byte[] _curImageBytes;
-        private HashSet<int> _previouslyAddedImageIds;
 
         public Main()
         {
             InitializeComponent();
         }
 
+        private static List<Training> Shuffle(string[] floorPlans, string[] notfloorPlans)
+        {
+            List<Training> shuffledList = new List<Training>();
+            shuffledList.AddRange(floorPlans.Select(x => new Training(x, 1)));
+            shuffledList.AddRange(notfloorPlans.Select(x => new Training(x, 0)));
+            Random rng = new Random();
+
+            int n = shuffledList.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = rng.Next(n + 1);
+                var value = shuffledList[k];
+                shuffledList[k] = shuffledList[n];
+                shuffledList[n] = value;
+            }
+
+            return shuffledList;
+        }
+
+        private struct Training
+        {
+            public string File;
+            public float[] Expected;
+            public Training(string file, float expectedOutput)
+            {
+                File = file;
+                Expected = new float[1] { expectedOutput };
+            }
+        }
 
         private void btnTrain_Click(object sender, EventArgs e)
         {
             btnTrain.Enabled = false;
 
             Status($"Loading Files...");
+
             var floorPlans = Directory.GetFiles(Path.Combine(txtTrainingFiles.Text, FloorPlan));
             var notfloorPlans = Directory.GetFiles(Path.Combine(txtTrainingFiles.Text, NotFloorPlan));
-            int totalTrainingFiles = floorPlans.Length + notfloorPlans.Length;
-            HashSet<string> trained = new HashSet<string>();
+            var totalTrainingFiles = floorPlans.Length + notfloorPlans.Length;
+            var trainingdata = Shuffle(floorPlans, notfloorPlans);
+
             Status($"Loaded {totalTrainingFiles} for training.");
+            progressBar1.Maximum = totalTrainingFiles;
+            progressBar1.Step = 1;
 
-            _curnetwork.learningRate
+            Status($"Training started...");
 
-            foreach (var listingNumber in _listingNumberss)
+            var trainingThread = new Thread(() =>
             {
-                Status($"Loading images for {listingNumber}");
-                var listingImages = GetListingImages();
-                for (int i = 0; i < listingImages.Length; i++)
+                foreach (var data in trainingdata)
                 {
-                    pictureBox1.Image = //use image service
+                    var originalImage = new Bitmap(data.File);
+                    var trainingImage = ImageProcessor.Normalize(originalImage);
+                    _curnetwork.BackPropagate(trainingImage, data.Expected);
+                    progressBar1.Invoke((MethodInvoker) delegate { 
+                        progressBar1.PerformStep();
+                        Status($"Cost: {_curnetwork.cost}");
+                    });
                 }
-            }
-            var originalImage = new Bitmap("");
-            pictureBox1.Image = originalImage;
-            var trainingImage = ImageProcessor.Normalize(originalImage);
 
-            var output = _curnetwork.FeedForward(trainingImage);
-
-            label1.Text = output[0].ToString();
+                btnTrain.Invoke((MethodInvoker)delegate {
+                    Status($"Training finished.");
+                    btnTrain.Enabled = true;
+                });
+            })
+            {
+                IsBackground = true
+            };
+            trainingThread.Start();
         }
 
         private void btnFloorPlan_Click(object sender, EventArgs e)
         {
-            var originalImage = new Bitmap("");
-            File.WriteAllBytes(Path.Combine(txtTrainingFiles.Text, FloorPlan, $"{_curImageId}.jpg"), _curImageBytes);
-            pictureBox1.Image = originalImage;
-            var trainingImage = ImageProcessor.Normalize(originalImage);
-            _curnetwork.BackPropagate(trainingImage, new float[] { 1 });
-
-            btnTrain_Click(sender, e);
+            _curnetwork.BackPropagate(curImageInput, new float[1] { 1 });
+            lblCost.Text = _curnetwork.cost.ToString();
         }
 
         private void btnNotFloorPlan_Click(object sender, EventArgs e)
         {
-            var originalImage = new Bitmap("");
-            pictureBox1.Image = originalImage;
-            var trainingImage = ImageProcessor.Normalize(originalImage);
-            _curnetwork.BackPropagate(trainingImage, new float[] { 0 });
-
-            btnTrain_Click(sender, e);
+            _curnetwork.BackPropagate(curImageInput, new float[1] { 0 });
+            lblCost.Text = _curnetwork.cost.ToString();
         }
 
         private void btnCreateNetwork_Click(object sender, EventArgs e)
@@ -92,7 +123,7 @@ namespace FloorPlanNet
         {
             try
             {
-                _curnetwork.Load(NetworkFiles);
+                _curnetwork = Network.LoadNetwork();
                 Status("Netork loaded");
             }
             catch (Exception ex)
@@ -110,12 +141,36 @@ namespace FloorPlanNet
         private void Status(string status)
         {
             var now = DateTime.Now;
-            txtStatus.Text = $"[{now.ToShortDateString()} {now.ToShortTimeString()}] {status}{Environment.NewLine}";
+            txtStatus.AppendText($"[{now.ToShortDateString()} {now.ToShortTimeString()}] {status}{Environment.NewLine}");
         }
 
-        private int[] GetListingImages(long listingNumber)
+        HttpClient client = new HttpClient();
+        float[] curImageInput;
+        private async void btnLoadImage_Click(object sender, EventArgs e)
         {
-            return new int[0];
+            try
+            {
+                var imageStream = await client.GetStreamAsync(txtInput.Text);
+                var image = new Bitmap(imageStream);
+                pictureBox1.Image = image;
+                var trainingImage = ImageProcessor.Normalize(image);
+                curImageInput = trainingImage;
+                lblOutput.Text = _curnetwork.FeedForward(trainingImage)[0].ToString();
+            }
+            catch
+            {
+
+            }
+        }
+
+        private void btnSkip_Click(object sender, EventArgs e)
+        {
+            var segments = txtInput.Text.Split('/');
+            var id = int.Parse(segments.Last());
+            segments[^1] = (++id).ToString();
+            txtInput.Text = string.Join('/', segments);
+
+            btnLoadImage_Click(sender, e);
         }
     }
 }

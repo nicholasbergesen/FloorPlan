@@ -16,3 +16,12 @@ C:\Users\nicho\Desktop\ImageFloorPlanIdentifier\NeuralNet\obj\Debug\netcoreapp3.
 C:\Users\nicho\Desktop\ImageFloorPlanIdentifier\NeuralNet\obj\Debug\netcoreapp3.1\NeuralNet.csproj.CoreCompileInputs.cache
 C:\Users\nicho\Desktop\ImageFloorPlanIdentifier\NeuralNet\obj\Debug\netcoreapp3.1\NeuralNet.dll
 C:\Users\nicho\Desktop\ImageFloorPlanIdentifier\NeuralNet\obj\Debug\netcoreapp3.1\NeuralNet.pdb
+C:\working\FloorPlan\NeuralNet\bin\Debug\netcoreapp3.1\NeuralNet.deps.json
+C:\working\FloorPlan\NeuralNet\bin\Debug\netcoreapp3.1\NeuralNet.dll
+C:\working\FloorPlan\NeuralNet\bin\Debug\netcoreapp3.1\NeuralNet.pdb
+C:\working\FloorPlan\NeuralNet\obj\Debug\netcoreapp3.1\NeuralNet.csprojAssemblyReference.cache
+C:\working\FloorPlan\NeuralNet\obj\Debug\netcoreapp3.1\NeuralNet.AssemblyInfoInputs.cache
+C:\working\FloorPlan\NeuralNet\obj\Debug\netcoreapp3.1\NeuralNet.AssemblyInfo.cs
+C:\working\FloorPlan\NeuralNet\obj\Debug\netcoreapp3.1\NeuralNet.csproj.CoreCompileInputs.cache
+C:\working\FloorPlan\NeuralNet\obj\Debug\netcoreapp3.1\NeuralNet.dll
+C:\working\FloorPlan\NeuralNet\obj\Debug\netcoreapp3.1\NeuralNet.pdb

@@ -13,11 +13,12 @@ namespace NeuralNet
     public class Network
     {
         //fundamental 
-        private int[] _layers;//layers
-        private float[][] _neurons;//neurons
-        private float[][] _biases;//biasses
-        private float[][][] _weights;//weights
-        private int[] _activations;//layers
+        public int[] _layers { get; set; }
+        public float[][] _neurons { get; set; }
+        public float[][] _biases { get; set; }
+        public float[][][] _weights { get; set; }
+        public int[] _activations { get; set; }
+
         private Random _r = new Random();
 
         //backprop
@@ -58,6 +59,7 @@ namespace NeuralNet
             InitWeights();
         }
 
+        public Network() { }
 
         private void InitNeurons()//create empty storage array for the neurons in the network.
         {
@@ -302,39 +304,40 @@ namespace NeuralNet
         //save and load functions
         public void Load(string path)//this loads the biases and weights from within a file into the neural network.
         {
-            using TextReader tr = new StreamReader(path);
-            int NumberOfLines = (int)new FileInfo(path).Length;
-            string[] ListLines = new string[NumberOfLines];
-            int index = 1;
-            for (int i = 1; i < NumberOfLines; i++)
-            {
-                ListLines[i] = tr.ReadLine();
-            }
-            tr.Close();
-            if (new FileInfo(path).Length > 0)
-            {
-                for (int i = 0; i < _biases.Length; i++)
-                {
-                    for (int j = 0; j < _biases[i].Length; j++)
-                    {
-                        _biases[i][j] = float.Parse(ListLines[index]);
-                        index++;
-                    }
-                }
+            //using TextReader tr = new StreamReader(path);
+            //int NumberOfLines = (int)new FileInfo(path).Length;
+            //string[] ListLines = new string[NumberOfLines];
+            //int index = 0;
+            //for (int i = 0; i < NumberOfLines; i++)
+            //{
+            //    ListLines[i] = tr.ReadLine();
+            //}
+            //tr.Close();
+            //if (new FileInfo(path).Length > 0)
+            //{
+            //    for (int i = 0; i < _biases.Length; i++)
+            //    {
+            //        for (int j = 0; j < _biases[i].Length; j++)
+            //        {
+            //            _biases[i][j] = float.Parse(ListLines[index]);
+            //            index++;
+            //        }
+            //    }
 
-                for (int i = 0; i < _weights.Length; i++)
-                {
-                    for (int j = 0; j < _weights[i].Length; j++)
-                    {
-                        for (int k = 0; k < _weights[i][j].Length; k++)
-                        {
-                            _weights[i][j][k] = float.Parse(ListLines[index]); ;
-                            index++;
-                        }
-                    }
-                }
-            }
+            //    for (int i = 0; i < _weights.Length; i++)
+            //    {
+            //        for (int j = 0; j < _weights[i].Length; j++)
+            //        {
+            //            for (int k = 0; k < _weights[i][j].Length; k++)
+            //            {
+            //                _weights[i][j][k] = float.Parse(ListLines[index]);
+            //                index++;
+            //            }
+            //        }
+            //    }
+            //}
         }
+
         public void Save(string path)//this is used for saving the biases and weights within the network to a file.
         {
             File.Create(path).Close();
@@ -358,6 +361,8 @@ namespace NeuralNet
                     }
                 }
             }
+
+            SaveNetwork(this);
         }
 
         private static void SaveNetwork(Network network)
@@ -365,7 +370,7 @@ namespace NeuralNet
             File.WriteAllText("Network.json", JsonSerializer.Serialize(network));
         }
 
-        private static Network LoadNetwork()
+        public static Network LoadNetwork()
         {
             string networkString = File.ReadAllText("Network.json");
             return JsonSerializer.Deserialize<Network>(networkString);

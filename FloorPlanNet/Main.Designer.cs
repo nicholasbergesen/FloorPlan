@@ -30,6 +30,10 @@
         {
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.lblCost = new System.Windows.Forms.Label();
+            this.btnLoadImage = new System.Windows.Forms.Button();
+            this.txtInput = new System.Windows.Forms.TextBox();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.btnSkip = new System.Windows.Forms.Button();
             this.txtTrainingFiles = new System.Windows.Forms.TextBox();
             this.txtStatus = new System.Windows.Forms.TextBox();
@@ -39,8 +43,7 @@
             this.btnTrain = new System.Windows.Forms.Button();
             this.btnFloorPlan = new System.Windows.Forms.Button();
             this.btnSaveNetwork = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.lblOutput = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -57,6 +60,9 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.lblCost);
+            this.panel1.Controls.Add(this.btnLoadImage);
+            this.panel1.Controls.Add(this.txtInput);
             this.panel1.Controls.Add(this.progressBar1);
             this.panel1.Controls.Add(this.btnSkip);
             this.panel1.Controls.Add(this.txtTrainingFiles);
@@ -67,21 +73,56 @@
             this.panel1.Controls.Add(this.btnTrain);
             this.panel1.Controls.Add(this.btnFloorPlan);
             this.panel1.Controls.Add(this.btnSaveNetwork);
-            this.panel1.Controls.Add(this.label1);
+            this.panel1.Controls.Add(this.lblOutput);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1380, 190);
             this.panel1.TabIndex = 11;
             // 
+            // lblCost
+            // 
+            this.lblCost.AutoSize = true;
+            this.lblCost.Location = new System.Drawing.Point(196, 160);
+            this.lblCost.Name = "lblCost";
+            this.lblCost.Size = new System.Drawing.Size(29, 15);
+            this.lblCost.TabIndex = 22;
+            this.lblCost.Text = "cost";
+            // 
+            // btnLoadImage
+            // 
+            this.btnLoadImage.Location = new System.Drawing.Point(440, 126);
+            this.btnLoadImage.Name = "btnLoadImage";
+            this.btnLoadImage.Size = new System.Drawing.Size(87, 23);
+            this.btnLoadImage.TabIndex = 21;
+            this.btnLoadImage.Text = "Load Image";
+            this.btnLoadImage.UseVisualStyleBackColor = true;
+            this.btnLoadImage.Click += new System.EventHandler(this.btnLoadImage_Click);
+            // 
+            // txtInput
+            // 
+            this.txtInput.Location = new System.Drawing.Point(12, 127);
+            this.txtInput.Name = "txtInput";
+            this.txtInput.Size = new System.Drawing.Size(422, 23);
+            this.txtInput.TabIndex = 20;
+            this.txtInput.Text = "https://images.prop24.com/150782963";
+            // 
+            // progressBar1
+            // 
+            this.progressBar1.Location = new System.Drawing.Point(12, 40);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(422, 23);
+            this.progressBar1.TabIndex = 19;
+            // 
             // btnSkip
             // 
-            this.btnSkip.Location = new System.Drawing.Point(196, 156);
+            this.btnSkip.Location = new System.Drawing.Point(319, 156);
             this.btnSkip.Name = "btnSkip";
-            this.btnSkip.Size = new System.Drawing.Size(117, 23);
+            this.btnSkip.Size = new System.Drawing.Size(91, 23);
             this.btnSkip.TabIndex = 18;
-            this.btnSkip.Text = "Skip (Next Image)";
+            this.btnSkip.Text = "Next Image";
             this.btnSkip.UseVisualStyleBackColor = true;
+            this.btnSkip.Click += new System.EventHandler(this.btnSkip_Click);
             // 
             // txtTrainingFiles
             // 
@@ -89,10 +130,11 @@
             this.txtTrainingFiles.Name = "txtTrainingFiles";
             this.txtTrainingFiles.Size = new System.Drawing.Size(422, 23);
             this.txtTrainingFiles.TabIndex = 17;
-            this.txtTrainingFiles.Text = "C:\\Users\\nicho\\Desktop\\ImageFloorPlanIdentifier\\FloorPlanNet\\TrainingData";
+            this.txtTrainingFiles.Text = "C:\\working\\FloorPlan\\FloorPlanNet\\TrainingData";
             // 
             // txtStatus
             // 
+            this.txtStatus.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txtStatus.Location = new System.Drawing.Point(893, 11);
             this.txtStatus.Multiline = true;
             this.txtStatus.Name = "txtStatus";
@@ -164,21 +206,14 @@
             this.btnSaveNetwork.UseVisualStyleBackColor = true;
             this.btnSaveNetwork.Click += new System.EventHandler(this.btnSaveNetwork_Click);
             // 
-            // label1
+            // lblOutput
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(319, 160);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(18, 15);
-            this.label1.TabIndex = 7;
-            this.label1.Text = "-1";
-            // 
-            // progressBar1
-            // 
-            this.progressBar1.Location = new System.Drawing.Point(12, 40);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(422, 23);
-            this.progressBar1.TabIndex = 19;
+            this.lblOutput.AutoSize = true;
+            this.lblOutput.Location = new System.Drawing.Point(416, 160);
+            this.lblOutput.Name = "lblOutput";
+            this.lblOutput.Size = new System.Drawing.Size(18, 15);
+            this.lblOutput.TabIndex = 7;
+            this.lblOutput.Text = "-1";
             // 
             // Main
             // 
@@ -206,11 +241,14 @@
         private System.Windows.Forms.Button btnTrain;
         private System.Windows.Forms.Button btnFloorPlan;
         private System.Windows.Forms.Button btnSaveNetwork;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lblOutput;
         private System.Windows.Forms.TextBox txtStatus;
         private System.Windows.Forms.TextBox txtTrainingFiles;
         private System.Windows.Forms.Button btnSkip;
         private System.Windows.Forms.ProgressBar progressBar1;
+        private System.Windows.Forms.Button btnLoadImage;
+        private System.Windows.Forms.TextBox txtInput;
+        private System.Windows.Forms.Label lblCost;
     }
 }
 
