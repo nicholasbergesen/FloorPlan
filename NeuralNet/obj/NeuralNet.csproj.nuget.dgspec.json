@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\working\\FloorPlan\\NeuralNet\\NeuralNet.csproj": {}
+    "C:\\working\\floorplan\\NeuralNet\\NeuralNet.csproj": {}
   },
   "projects": {
-    "C:\\working\\FloorPlan\\NeuralNet\\NeuralNet.csproj": {
+    "C:\\working\\floorplan\\NeuralNet\\NeuralNet.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\working\\FloorPlan\\NeuralNet\\NeuralNet.csproj",
+        "projectUniqueName": "C:\\working\\floorplan\\NeuralNet\\NeuralNet.csproj",
         "projectName": "NeuralNet",
-        "projectPath": "C:\\working\\FloorPlan\\NeuralNet\\NeuralNet.csproj",
-        "packagesPath": "C:\\Users\\nicho\\.nuget\\packages\\",
-        "outputPath": "C:\\working\\FloorPlan\\NeuralNet\\obj\\",
+        "projectPath": "C:\\working\\floorplan\\NeuralNet\\NeuralNet.csproj",
+        "packagesPath": "C:\\Users\\nicholasb\\.nuget\\packages\\",
+        "outputPath": "C:\\working\\floorplan\\NeuralNet\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\nicho\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\nicholasb\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -25,7 +25,9 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "https://api.nuget.org/v3/index.json": {}
+          "http://nuget.ad.property24.com/nuget": {},
+          "https://api.nuget.org/v3/index.json": {},
+          "https://dotnet.myget.org/F/roslyn/api/v3/index.json": {}
         },
         "frameworks": {
           "netcoreapp3.1": {

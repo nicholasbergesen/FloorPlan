@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "f07UnT4aWrRWhP80w53Db/Eltink8il5f/T17qEc38mbp69LN/1uYXU1Jjc0TZ7/RUTwSG6UBrHZsLPaHCMxog==",
+  "dgSpecHash": "TixdiWuYMAxIsUGyQ6tov7VvMYpq1ByllS6n2iz57iNEZvREnlm0wupaaLyOCI0F3RLPJH3kDqG+4a0XWqS7hw==",
   "success": true,
-  "projectFilePath": "C:\\working\\FloorPlan\\NeuralNet\\NeuralNet.csproj",
+  "projectFilePath": "C:\\working\\floorplan\\NeuralNet\\NeuralNet.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

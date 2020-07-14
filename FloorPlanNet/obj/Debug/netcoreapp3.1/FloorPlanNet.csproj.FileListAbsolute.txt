@@ -51,8 +51,14 @@ C:\working\FloorPlan\FloorPlanNet\obj\Debug\netcoreapp3.1\FloorPlanNet.Main.reso
 C:\working\FloorPlan\FloorPlanNet\obj\Debug\netcoreapp3.1\FloorPlanNet.csproj.GenerateResource.cache
 C:\working\FloorPlan\FloorPlanNet\obj\Debug\netcoreapp3.1\FloorPlanNet.AssemblyInfoInputs.cache
 C:\working\FloorPlan\FloorPlanNet\obj\Debug\netcoreapp3.1\FloorPlanNet.AssemblyInfo.cs
-C:\working\FloorPlan\FloorPlanNet\obj\Debug\netcoreapp3.1\FloorPlanNet.csproj.CoreCompileInputs.cache
 C:\working\FloorPlan\FloorPlanNet\obj\Debug\netcoreapp3.1\FloorPlanNet.csproj.CopyComplete
 C:\working\FloorPlan\FloorPlanNet\obj\Debug\netcoreapp3.1\FloorPlanNet.dll
 C:\working\FloorPlan\FloorPlanNet\obj\Debug\netcoreapp3.1\FloorPlanNet.pdb
 C:\working\FloorPlan\FloorPlanNet\obj\Debug\netcoreapp3.1\FloorPlanNet.genruntimeconfig.cache
+C:\working\FloorPlan\FloorPlanNet\obj\Debug\netcoreapp3.1\FloorPlanNet.csproj.CoreCompileInputs.cache
+C:\working\FloorPlan\FloorPlanNet\bin\Debug\netcoreapp3.1\System.Data.SqlClient.dll
+C:\working\FloorPlan\FloorPlanNet\bin\Debug\netcoreapp3.1\runtimes\win-arm64\native\sni.dll
+C:\working\FloorPlan\FloorPlanNet\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\sni.dll
+C:\working\FloorPlan\FloorPlanNet\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\sni.dll
+C:\working\FloorPlan\FloorPlanNet\bin\Debug\netcoreapp3.1\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll
+C:\working\FloorPlan\FloorPlanNet\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll

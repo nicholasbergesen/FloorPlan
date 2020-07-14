@@ -12,7 +12,6 @@ namespace NeuralNet
     [Serializable]
     public class Network
     {
-        //fundamental 
         public int[] _layers { get; set; }
         public float[][] _neurons { get; set; }
         public float[][] _biases { get; set; }
@@ -21,8 +20,7 @@ namespace NeuralNet
 
         private Random _r = new Random();
 
-        //backprop
-        private float learningRate = 0.01f;//learning rate
+        private float learningRate = 0.01f;
         public float cost = 0;
 
         public Network(int[] layers, string[] layerActivations)
@@ -61,7 +59,7 @@ namespace NeuralNet
 
         public Network() { }
 
-        private void InitNeurons()//create empty storage array for the neurons in the network.
+        private void InitNeurons()
         {
             List<float[]> neuronsList = new List<float[]>();
             for (int i = 0; i < _layers.Length; i++)
@@ -71,10 +69,8 @@ namespace NeuralNet
             _neurons = neuronsList.ToArray();
         }
 
-        private void InitBiases()//initializes random array for the biases being held within the network.
+        private void InitBiases()
         {
-
-
             List<float[]> biasList = new List<float[]>();
             for (int i = 1; i < _layers.Length; i++)
             {
@@ -88,7 +84,7 @@ namespace NeuralNet
             _biases = biasList.ToArray();
         }
 
-        private void InitWeights()//initializes random array for the weights being held in the network.
+        private void InitWeights()
         {
             List<float[][]> weightsList = new List<float[][]>();
             for (int i = 1; i < _layers.Length; i++)
@@ -109,7 +105,7 @@ namespace NeuralNet
             _weights = weightsList.ToArray();
         }
 
-        public float[] FeedForward(float[] inputs)//feed forward, inputs >==> outputs.
+        public float[] FeedForward(float[] inputs)
         {
             for (int i = 0; i < inputs.Length; i++)
             {
@@ -130,8 +126,8 @@ namespace NeuralNet
             }
             return _neurons[_layers.Length - 1];
         }
-        //Backpropagation implemtation down until mutation.
-        private float activate(float value, int layer)//all activation functions
+
+        private float activate(float value, int layer)
         {
             switch (_activations[layer])
             {
@@ -147,7 +143,7 @@ namespace NeuralNet
                     return relu(value);
             }
         }
-        private float activateDer(float value, int layer)//all activation function derivatives
+        private float activateDer(float value, int layer)
         {
             switch (_activations[layer])
             {
@@ -164,7 +160,7 @@ namespace NeuralNet
             }
         }
 
-        private float sigmoid(float x)//activation functions and their corrosponding derivatives
+        private float sigmoid(float x)
         {
             float k = (float)Math.Exp(x);
             return k / (1.0f + k);
@@ -198,12 +194,12 @@ namespace NeuralNet
             return (0 >= x) ? 0.01f : 1;
         }
 
-        public void BackPropagate(float[] inputs, float[] expected)//backpropogation;
+        public void BackPropagate(float[] inputs, float[] expected)
         {
             float[] output = FeedForward(inputs);//runs feed forward to ensure neurons are populated correctly
 
             cost = 0;
-            for (int i = 0; i < output.Length; i++) cost += (float)Math.Pow(output[i] - expected[i], 2);//calculated cost of network
+            for (int i = 0; i < output.Length; i++) cost += (float)Math.Pow(output[i] - expected[i], 2);
             cost = cost / 2;//this value is not used in calculions, rather used to identify the performance of the network
 
             float[][] gamma;
@@ -251,121 +247,7 @@ namespace NeuralNet
             }
         }
 
-        //Genetic implementations down onwards until save.
-        public void Mutate(int high, float val)//used as a simple mutation function for any genetic implementations.
-        {
-            for (int i = 0; i < _biases.Length; i++)
-            {
-                for (int j = 0; j < _biases[i].Length; j++)
-                {
-                    _biases[i][j] = (GetRandomNumber(0f, high) <= 2) ? _biases[i][j] += GetRandomNumber(-val, val) : _biases[i][j];
-                }
-            }
-
-            for (int i = 0; i < _weights.Length; i++)
-            {
-                for (int j = 0; j < _weights[i].Length; j++)
-                {
-                    for (int k = 0; k < _weights[i][j].Length; k++)
-                    {
-                        _weights[i][j][k] = (GetRandomNumber(0f, high) <= 2) ? _weights[i][j][k] += GetRandomNumber(-val, val) : _weights[i][j][k];
-                    }
-                }
-            }
-        }
-
-        private float GetRandomNumber(float minimum, float maximum)
-        {
-            return ((float)_r.NextDouble()) * (maximum - minimum) + minimum;
-        }
-
-        private Network copy(Network nn) //For creatinga deep copy, to ensure arrays are serialzed.
-        {
-            for (int i = 0; i < _biases.Length; i++)
-            {
-                for (int j = 0; j < _biases[i].Length; j++)
-                {
-                    nn._biases[i][j] = _biases[i][j];
-                }
-            }
-            for (int i = 0; i < _weights.Length; i++)
-            {
-                for (int j = 0; j < _weights[i].Length; j++)
-                {
-                    for (int k = 0; k < _weights[i][j].Length; k++)
-                    {
-                        nn._weights[i][j][k] = _weights[i][j][k];
-                    }
-                }
-            }
-            return nn;
-        }
-
-        //save and load functions
-        public void Load(string path)//this loads the biases and weights from within a file into the neural network.
-        {
-            //using TextReader tr = new StreamReader(path);
-            //int NumberOfLines = (int)new FileInfo(path).Length;
-            //string[] ListLines = new string[NumberOfLines];
-            //int index = 0;
-            //for (int i = 0; i < NumberOfLines; i++)
-            //{
-            //    ListLines[i] = tr.ReadLine();
-            //}
-            //tr.Close();
-            //if (new FileInfo(path).Length > 0)
-            //{
-            //    for (int i = 0; i < _biases.Length; i++)
-            //    {
-            //        for (int j = 0; j < _biases[i].Length; j++)
-            //        {
-            //            _biases[i][j] = float.Parse(ListLines[index]);
-            //            index++;
-            //        }
-            //    }
-
-            //    for (int i = 0; i < _weights.Length; i++)
-            //    {
-            //        for (int j = 0; j < _weights[i].Length; j++)
-            //        {
-            //            for (int k = 0; k < _weights[i][j].Length; k++)
-            //            {
-            //                _weights[i][j][k] = float.Parse(ListLines[index]);
-            //                index++;
-            //            }
-            //        }
-            //    }
-            //}
-        }
-
-        public void Save(string path)//this is used for saving the biases and weights within the network to a file.
-        {
-            File.Create(path).Close();
-            using StreamWriter writer = new StreamWriter(path, true);
-
-            for (int i = 0; i < _biases.Length; i++)
-            {
-                for (int j = 0; j < _biases[i].Length; j++)
-                {
-                    writer.WriteLine(_biases[i][j]);
-                }
-            }
-
-            for (int i = 0; i < _weights.Length; i++)
-            {
-                for (int j = 0; j < _weights[i].Length; j++)
-                {
-                    for (int k = 0; k < _weights[i][j].Length; k++)
-                    {
-                        writer.WriteLine(_weights[i][j][k]);
-                    }
-                }
-            }
-
-            SaveNetwork(this);
-        }
-
-        private static void SaveNetwork(Network network)
+        public static void SaveNetwork(Network network)
         {
             File.WriteAllText("Network.json", JsonSerializer.Serialize(network));
         }

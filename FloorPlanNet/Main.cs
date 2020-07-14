@@ -1,12 +1,16 @@
 ﻿using NeuralNet;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Policy;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -60,11 +64,12 @@ namespace FloorPlanNet
 
         private void btnTrain_Click(object sender, EventArgs e)
         {
+            float totalCost = 0;
             btnTrain.Enabled = false;
 
             Status($"Loading Files...");
 
-            var floorPlans = Directory.GetFiles(Path.Combine(txtTrainingFiles.Text, FloorPlan));
+            var floorPlans = Directory.GetFiles(Path.Combine(txtTrainingFiles.Text, FloorPlan), "*.*", SearchOption.AllDirectories);
             var notfloorPlans = Directory.GetFiles(Path.Combine(txtTrainingFiles.Text, NotFloorPlan));
             var totalTrainingFiles = floorPlans.Length + notfloorPlans.Length;
             var trainingdata = Shuffle(floorPlans, notfloorPlans);
@@ -77,20 +82,25 @@ namespace FloorPlanNet
 
             var trainingThread = new Thread(() =>
             {
+                int count = 0;
                 foreach (var data in trainingdata)
                 {
                     var originalImage = new Bitmap(data.File);
                     var trainingImage = ImageProcessor.Normalize(originalImage);
                     _curnetwork.BackPropagate(trainingImage, data.Expected);
-                    progressBar1.Invoke((MethodInvoker) delegate { 
+                    progressBar1.Invoke((MethodInvoker)delegate
+                    {
                         progressBar1.PerformStep();
-                        Status($"Cost: {_curnetwork.cost}");
+                        totalCost += _curnetwork.cost;
+                        Status($"Avg Cost: {totalCost / ++count}");
                     });
                 }
 
-                btnTrain.Invoke((MethodInvoker)delegate {
+                btnTrain.Invoke((MethodInvoker)delegate
+                {
                     Status($"Training finished.");
                     btnTrain.Enabled = true;
+                    progressBar1.Value = 0;
                 });
             })
             {
@@ -113,7 +123,7 @@ namespace FloorPlanNet
 
         private void btnCreateNetwork_Click(object sender, EventArgs e)
         {
-            int[] layers = new int[4] { 784, 28, 28, 1 };
+            int[] layers = new int[4] { 784, 49, 16, 1 };
             string[] activation = new string[3] { "leakyrelu", "leakyrelu", "leakyrelu" };
             _curnetwork = new Network(layers, activation);
             Status("Netork Created");
@@ -134,7 +144,7 @@ namespace FloorPlanNet
 
         private void btnSaveNetwork_Click(object sender, EventArgs e)
         {
-            _curnetwork.Save(NetworkFiles);
+            Network.SaveNetwork(_curnetwork);
             Status("Netork saved");
         }
 
@@ -171,6 +181,243 @@ namespace FloorPlanNet
             txtInput.Text = string.Join('/', segments);
 
             btnLoadImage_Click(sender, e);
+        }
+
+        private const string DevelopmentIds = @"select top 1000 d.ImageId from Development a 
+                                    inner join PropertySearch b on b.DevelopmentId = a.Id
+                                    inner join MandateImage c on c.MandateId = b.MandateId
+                                    inner join ImageReferenceIdToImageId d on d.ReferenceId = c.ImageReferenceId
+                                    where d.Confidence is null";
+
+        private const string HasDevelopmentIds = @"select top 1 d.ImageId from Development a 
+                                    inner join PropertySearch b on b.DevelopmentId = a.Id
+                                    inner join MandateImage c on c.MandateId = b.MandateId
+                                    inner join ImageReferenceIdToImageId d on d.ReferenceId = c.ImageReferenceId
+                                    where d.Confidence is null";
+
+        private const string UnprocessedImages = @"select top 1000 ImageId from ImageReferenceIdToImageId where Confidence is null";
+        private const string HasUnprocessedImages = @"select top 1 ImageId from ImageReferenceIdToImageId where Confidence is null";
+
+        private const string MultiThreadImages = @"select top 100000 ImageId from ImageReferenceIdToImageId where Confidence is null";
+        private const string GetRemainingTotal = @"select count(*) ImageId from ImageReferenceIdToImageId where Confidence is null";
+
+        private async void btnIdentifyFloorPlans_Click(object sender, EventArgs e)
+        {
+            //await SingleThreadProcess();
+            await MultiThreadProcess();
+        }
+
+        BlockingCollection<int> imageIdBatch = new BlockingCollection<int>(100000);
+
+        private async Task MultiThreadProcess()
+        {
+            Status("Started Mltithread processing.");
+
+            _curnetwork = Network.LoadNetwork();
+
+            using SqlConnection conn = new SqlConnection("Data Source=.;Initial Catalog=FloorPlan;Integrated Security=true");
+            await conn.OpenAsync();
+            using var comCount = conn.CreateCommand();
+            comCount.CommandText = GetRemainingTotal;
+            int totalImages = (int)await comCount.ExecuteScalarAsync();
+
+            new Thread(async () =>
+            {
+                using SqlConnection conn = new SqlConnection("Data Source=.;Initial Catalog=FloorPlan;Integrated Security=true");
+                await conn.OpenAsync();
+                using var comSelect = conn.CreateCommand();
+                comSelect.CommandText = MultiThreadImages;
+                var imageIdReader = await comSelect.ExecuteReaderAsync();
+                while (imageIdReader.Read())
+                    imageIdBatch.Add(imageIdReader.GetInt32(0));
+                imageIdBatch.CompleteAdding();
+
+                List<Thread> threads = new List<Thread>();
+                for (int i = 0; i < Environment.ProcessorCount; i++)
+                {
+                    var newThread = new Thread(async () => { await ProcessMultiThread(); })
+                    {
+                        IsBackground = true
+                    };
+                    newThread.Start();
+                    threads.Add(newThread);
+                }
+            })
+            .Start();
+        }
+
+        private async Task ProcessMultiThread()
+        {
+            var token = _source.Token;
+            var curnetwork = Network.LoadNetwork();
+
+            while (!imageIdBatch.IsCompleted && imageIdBatch.TryTake(out int imageId) && !token.IsCancellationRequested)
+            {
+                var imageUrl = "https://img.trk.static-ptl.p24/" + imageId;
+                try
+                {
+                    var imageStream = await client.GetStreamAsync(imageUrl);
+                    var image = new Bitmap(imageStream);
+                    var trainingImage = ImageProcessor.Normalize(image);
+                    var confidence = curnetwork.FeedForward(trainingImage)[0];
+                    await SaveConfidence(imageId, confidence);
+                }
+                catch
+                {
+                    await SaveConfidence(imageId, 100f);
+                }
+            }
+        }
+
+        private async Task SingleThreadProcess()
+        {
+            _curnetwork = Network.LoadNetwork();
+
+            using SqlConnection conn = new SqlConnection("Data Source=.;Initial Catalog=FloorPlan;Integrated Security=true");
+            await conn.OpenAsync();
+            using var comSelect = conn.CreateCommand();
+            comSelect.CommandText = HasUnprocessedImages;
+            var imageId = await comSelect.ExecuteScalarAsync();
+
+            while (imageId != null)
+            {
+                await Process();
+
+                using var comSelect2 = conn.CreateCommand();
+                comSelect2.CommandText = HasUnprocessedImages;
+                imageId = await comSelect.ExecuteScalarAsync();
+            }
+
+            Status("Identify floor plans complete.");
+        }
+
+        private async Task Process()
+        {
+            using SqlConnection conn = new SqlConnection("Data Source=.;Initial Catalog=FloorPlan;Integrated Security=true");
+            await conn.OpenAsync();
+            using var comSelect = conn.CreateCommand();
+            comSelect.CommandText = UnprocessedImages;
+            using var selectReader = await comSelect.ExecuteReaderAsync();
+
+            Status("Processing batch");
+            while (selectReader.Read())
+            {
+                var imageId = selectReader.GetInt32(0);
+                var imageUrl = "https://img.trk.static-ptl.p24/" + imageId;
+                try
+                {
+                    var imageStream = await client.GetStreamAsync(imageUrl);
+                    var image = new Bitmap(imageStream);
+                    var trainingImage = ImageProcessor.Normalize(image);
+                    var confidence = _curnetwork.FeedForward(trainingImage)[0];
+                    await SaveConfidence(imageId, confidence);
+                }
+                catch
+                {
+                    await SaveConfidence(imageId, 100f);
+                }
+            }
+            await selectReader.CloseAsync();
+        }
+
+        private async Task SaveConfidence(int imageId, float confidence)
+        {
+            using SqlConnection conn = new SqlConnection("Data Source=.;Initial Catalog=FloorPlan;Integrated Security=true");
+            await conn.OpenAsync();
+            using var comUpdate = conn.CreateCommand();
+            comUpdate.Parameters.AddWithValue("@conf", confidence);
+            comUpdate.Parameters.AddWithValue("@imageId", imageId);
+            comUpdate.CommandText = "update ImageReferenceIdToImageId set Confidence = @conf where ImageId = @imageId";
+            await comUpdate.ExecuteNonQueryAsync();
+
+            if (confidence > 0.75 && confidence != 100)
+            {
+                txtGenInputs.Invoke((MethodInvoker)delegate
+                {
+                    txtGenInputs.AppendText("https://img.trk.static-ptl.p24/" + imageId + Environment.NewLine);
+                });
+            }
+        }
+
+        private void btnGenerateClassifier_Click(object sender, EventArgs e)
+        {
+            Status("Generating file...");
+
+            string[] imageIds = txtGenInputs.Text.Split(Environment.NewLine);
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("<Html>");
+            sb.AppendLine("<HEAD>");
+            sb.AppendLine("<body>");
+
+            for (int i = 0; i < imageIds.Length; i++)
+                if(!string.IsNullOrWhiteSpace(imageIds[i]))
+                    sb.AppendLine($"<img style=\"width:310px;height:310px\" loading=\"lazy\" src=\"{imageIds[i]}\" />");
+
+            sb.AppendLine("<body>");
+            sb.AppendLine("</HEAD>");
+            sb.AppendLine("</Html>");
+
+            File.WriteAllText("Gen.html", sb.ToString());
+
+            Status("File Generated.");
+        }
+
+        CancellationTokenSource _source = new CancellationTokenSource();
+
+        private void btnStop_Click(object sender, EventArgs e)
+        {
+            _source.Cancel();
+            imageIdBatch = new BlockingCollection<int>(100000);
+            Status("Multithreading stopped.");
+            _source = new CancellationTokenSource();
+        }
+
+        private void btnTestData_Click(object sender, EventArgs e)
+        {
+            var floorPlans = Directory.GetFiles(Path.Combine(txtTrainingFiles.Text, FloorPlan), "*.*", SearchOption.TopDirectoryOnly);
+            foreach (var data in floorPlans)
+            {
+                //var originalImage = new Bitmap(floorPlans[0]);
+                //txtInput.Text = floorPlans[0];
+                //pictureBox1.Image = ImageProcessor.ChangeWhite(originalImage);
+                
+                var img = Image.FromFile(data);
+                var res = ImageProcessor.ChangeWhite(img);
+
+                res.Save(Path.Combine(txtTrainingFiles.Text, FloorPlan, "Mod", new FileInfo(data).Name), ImageFormat.Jpeg);
+            }
+        }
+
+        private void btnFlip_Click(object sender, EventArgs e)
+        {
+            var floorPlans = Directory.GetFiles(Path.Combine(txtTrainingFiles.Text, FloorPlan), "*.*", SearchOption.TopDirectoryOnly);
+            foreach (var data in floorPlans)
+            {
+                //var originalImage = new Bitmap(floorPlans[0]);
+                //txtInput.Text = floorPlans[0];
+                //pictureBox1.Image = ImageProcessor.ChangeWhite(originalImage);
+                
+                var img = Image.FromFile(data);
+                img.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                var imgPath = Path.Combine(txtTrainingFiles.Text, FloorPlan, "Flip270", new FileInfo(data).Name);
+                img.Save(imgPath, ImageFormat.Jpeg);
+            }
+        }
+
+        private async void btnTestImage_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var imageStream = await client.GetStreamAsync(txtInput.Text);
+                var image = new Bitmap(imageStream);
+                var greyImage = ImageProcessor.MakeGreyScale(image);
+                var smallImage = ImageProcessor.ResizeImage(greyImage, 28, 28);
+                pictureBox2.Image = smallImage;
+            }
+            catch
+            {
+
+            }
         }
     }
 }

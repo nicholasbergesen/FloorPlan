@@ -52,6 +52,43 @@ namespace FloorPlanNet
             return destImage;
         }
 
+        public static Bitmap ChangeWhite(Image image)
+        {
+            Bitmap newImage = new Bitmap(image);
+            for (int x = 0; x < newImage.Width; x++)
+            {
+                for (int y = 0; y < newImage.Height; y++)
+                {
+                    var pixel = newImage.GetPixel(x, y);
+                    int average = (pixel.R + pixel.G + pixel.B) / 3;
+                    if (average > 250)
+                    {
+                        average = 125;
+                        newImage.SetPixel(x, y, Color.FromArgb(average, average, average));
+                    }
+                }
+            }
+            return newImage;
+        }
+
+        public static Bitmap Flip(Image image)
+        {
+            Bitmap newImage = new Bitmap(image);
+            for (int x = 0; x < newImage.Width; x++)
+            {
+                for (int y = 0; y < newImage.Height; y++)
+                {
+                    var pixelTop = newImage.GetPixel(x, y);
+                    var pixelInvert = newImage.GetPixel(newImage.Width - 1 - x, newImage.Height - 1 - y);
+                    newImage.SetPixel(x, y, Color.FromArgb(pixelInvert.A, pixelInvert.R, pixelInvert.G, pixelInvert.B));
+                    newImage.SetPixel(newImage.Width - 1 - x, newImage.Height - 1 - y, Color.FromArgb(pixelTop.A, pixelTop.R, pixelTop.G, pixelTop.B));
+                    //newImage.RotateFlip(RotateFlipType.RotateNoneFlipX);
+                    //newImage.RotateFlip(RotateFlipType.RotateNoneFlipX);
+                }
+            }
+            return newImage;
+        }
+
         public static float[] Normalize(Bitmap image)
         {
             var greyImage = MakeGreyScale(image);
