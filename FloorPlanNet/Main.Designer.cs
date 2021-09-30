@@ -155,18 +155,18 @@
             // txtStatus
             // 
             this.txtStatus.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txtStatus.Location = new System.Drawing.Point(893, 11);
+            this.txtStatus.Location = new System.Drawing.Point(823, 11);
             this.txtStatus.Multiline = true;
             this.txtStatus.Name = "txtStatus";
             this.txtStatus.ReadOnly = true;
             this.txtStatus.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtStatus.Size = new System.Drawing.Size(365, 168);
+            this.txtStatus.Size = new System.Drawing.Size(555, 168);
             this.txtStatus.TabIndex = 16;
             // 
             // btnCreateNetwork
             // 
             this.btnCreateNetwork.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCreateNetwork.Location = new System.Drawing.Point(1274, 12);
+            this.btnCreateNetwork.Location = new System.Drawing.Point(713, 12);
             this.btnCreateNetwork.Name = "btnCreateNetwork";
             this.btnCreateNetwork.Size = new System.Drawing.Size(104, 23);
             this.btnCreateNetwork.TabIndex = 10;
@@ -177,7 +177,7 @@
             // btnLoadNetwork
             // 
             this.btnLoadNetwork.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnLoadNetwork.Location = new System.Drawing.Point(1274, 41);
+            this.btnLoadNetwork.Location = new System.Drawing.Point(713, 41);
             this.btnLoadNetwork.Name = "btnLoadNetwork";
             this.btnLoadNetwork.Size = new System.Drawing.Size(104, 23);
             this.btnLoadNetwork.TabIndex = 5;
@@ -218,7 +218,7 @@
             // btnSaveNetwork
             // 
             this.btnSaveNetwork.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSaveNetwork.Location = new System.Drawing.Point(1274, 70);
+            this.btnSaveNetwork.Location = new System.Drawing.Point(713, 70);
             this.btnSaveNetwork.Name = "btnSaveNetwork";
             this.btnSaveNetwork.Size = new System.Drawing.Size(104, 23);
             this.btnSaveNetwork.TabIndex = 6;
@@ -237,7 +237,7 @@
             // 
             // btnShowNormalizeImage
             // 
-            this.btnShowNormalizeImage.Location = new System.Drawing.Point(735, 226);
+            this.btnShowNormalizeImage.Location = new System.Drawing.Point(671, 197);
             this.btnShowNormalizeImage.Name = "btnShowNormalizeImage";
             this.btnShowNormalizeImage.Size = new System.Drawing.Size(112, 23);
             this.btnShowNormalizeImage.TabIndex = 27;
@@ -269,7 +269,7 @@
             // 
             // pictureBox2
             // 
-            this.pictureBox2.Location = new System.Drawing.Point(735, 253);
+            this.pictureBox2.Location = new System.Drawing.Point(671, 226);
             this.pictureBox2.Name = "pictureBox2";
             this.pictureBox2.Size = new System.Drawing.Size(196, 196);
             this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;

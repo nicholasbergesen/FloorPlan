@@ -52,7 +52,7 @@ namespace FloorPlanNet
             return destImage;
         }
 
-        public static Bitmap ChangeWhite(Image image)
+        public static Bitmap ChangeWhiteToGrey(Image image)
         {
             Bitmap newImage = new Bitmap(image);
             for (int x = 0; x < newImage.Width; x++)
@@ -71,7 +71,7 @@ namespace FloorPlanNet
             return newImage;
         }
 
-        public static Bitmap Flip(Image image)
+        public static Bitmap Flip(Image image, RotateFlipType rotateFlip)
         {
             Bitmap newImage = new Bitmap(image);
             for (int x = 0; x < newImage.Width; x++)
@@ -82,8 +82,7 @@ namespace FloorPlanNet
                     var pixelInvert = newImage.GetPixel(newImage.Width - 1 - x, newImage.Height - 1 - y);
                     newImage.SetPixel(x, y, Color.FromArgb(pixelInvert.A, pixelInvert.R, pixelInvert.G, pixelInvert.B));
                     newImage.SetPixel(newImage.Width - 1 - x, newImage.Height - 1 - y, Color.FromArgb(pixelTop.A, pixelTop.R, pixelTop.G, pixelTop.B));
-                    //newImage.RotateFlip(RotateFlipType.RotateNoneFlipX);
-                    //newImage.RotateFlip(RotateFlipType.RotateNoneFlipX);
+                    newImage.RotateFlip(rotateFlip);
                 }
             }
             return newImage;

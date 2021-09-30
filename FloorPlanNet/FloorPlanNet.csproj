@@ -14,4 +14,8 @@
     <ProjectReference Include="..\NeuralNet\NeuralNet.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="NewStruct\" />
+  </ItemGroup>
+
 </Project>

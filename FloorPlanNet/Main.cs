@@ -139,10 +139,16 @@ namespace FloorPlanNet
 
         private void BtnCreateNetwork_Click(object sender, EventArgs e)
         {
-            int[] layers = new int[4] { 784, 49, 16, 1 };
-            Activation[] activation = new Activation[3] { Activation.LeakyRelu, Activation.LeakyRelu, Activation.LeakyRelu };
-            _curnetwork = new Network(layers, activation);
-            Status("Network  Created");
+            Layer[] layers = new Layer[4] 
+            { 
+                new Layer(784, Activation.LeakyRelu), 
+                new Layer(49, Activation.LeakyRelu), 
+                new Layer(16, Activation.LeakyRelu), 
+                new Layer(1, Activation.LeakyRelu) 
+            };
+
+            _curnetwork = new Network(layers);
+            Status("Network Created");
         }
 
         private void BtnLoadNetwork_Click(object sender, EventArgs e)
@@ -221,7 +227,7 @@ namespace FloorPlanNet
             {
                 var img = Image.FromFile(data);
                 //img.RotateFlip(RotateFlipType.RotateNoneFlipXY);
-                var res = ImageProcessor.ChangeWhite(img);
+                var res = ImageProcessor.ChangeWhiteToGrey(img);
 
                 res.Save(Path.Combine(txtTrainingFiles.Text, FloorPlan, "Mod", new FileInfo(data).Name), ImageFormat.Jpeg);
             }
