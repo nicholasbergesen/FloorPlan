@@ -30,16 +30,12 @@
         {
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.btnTestImage = new System.Windows.Forms.Button();
-            this.btnFlip = new System.Windows.Forms.Button();
-            this.btnTestData = new System.Windows.Forms.Button();
-            this.btnStop = new System.Windows.Forms.Button();
-            this.btnIdentifyFloorPlans = new System.Windows.Forms.Button();
+            this.btnStopTraining = new System.Windows.Forms.Button();
+            this.btnGenerateSyntheticTestData = new System.Windows.Forms.Button();
             this.lblCost = new System.Windows.Forms.Label();
             this.btnLoadImage = new System.Windows.Forms.Button();
             this.txtInput = new System.Windows.Forms.TextBox();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
-            this.btnSkip = new System.Windows.Forms.Button();
             this.txtTrainingFiles = new System.Windows.Forms.TextBox();
             this.txtStatus = new System.Windows.Forms.TextBox();
             this.btnCreateNetwork = new System.Windows.Forms.Button();
@@ -49,6 +45,7 @@
             this.btnFloorPlan = new System.Windows.Forms.Button();
             this.btnSaveNetwork = new System.Windows.Forms.Button();
             this.lblOutput = new System.Windows.Forms.Label();
+            this.btnShowNormalizeImage = new System.Windows.Forms.Button();
             this.txtGenInputs = new System.Windows.Forms.TextBox();
             this.btnGenerateClassifier = new System.Windows.Forms.Button();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
@@ -71,16 +68,12 @@
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.btnTestImage);
-            this.panel1.Controls.Add(this.btnFlip);
-            this.panel1.Controls.Add(this.btnTestData);
-            this.panel1.Controls.Add(this.btnStop);
-            this.panel1.Controls.Add(this.btnIdentifyFloorPlans);
+            this.panel1.Controls.Add(this.btnStopTraining);
+            this.panel1.Controls.Add(this.btnGenerateSyntheticTestData);
             this.panel1.Controls.Add(this.lblCost);
             this.panel1.Controls.Add(this.btnLoadImage);
             this.panel1.Controls.Add(this.txtInput);
             this.panel1.Controls.Add(this.progressBar1);
-            this.panel1.Controls.Add(this.btnSkip);
             this.panel1.Controls.Add(this.txtTrainingFiles);
             this.panel1.Controls.Add(this.txtStatus);
             this.panel1.Controls.Add(this.btnCreateNetwork);
@@ -96,55 +89,26 @@
             this.panel1.Size = new System.Drawing.Size(1390, 190);
             this.panel1.TabIndex = 11;
             // 
-            // btnTestImage
+            // btnStopTraining
             // 
-            this.btnTestImage.Location = new System.Drawing.Point(618, 12);
-            this.btnTestImage.Name = "btnTestImage";
-            this.btnTestImage.Size = new System.Drawing.Size(75, 23);
-            this.btnTestImage.TabIndex = 27;
-            this.btnTestImage.Text = "Test Image";
-            this.btnTestImage.UseVisualStyleBackColor = true;
-            this.btnTestImage.Click += new System.EventHandler(this.btnTestImage_Click);
+            this.btnStopTraining.Enabled = false;
+            this.btnStopTraining.Location = new System.Drawing.Point(93, 69);
+            this.btnStopTraining.Name = "btnStopTraining";
+            this.btnStopTraining.Size = new System.Drawing.Size(75, 23);
+            this.btnStopTraining.TabIndex = 26;
+            this.btnStopTraining.Text = "Stop Training";
+            this.btnStopTraining.UseVisualStyleBackColor = true;
+            this.btnStopTraining.Click += new System.EventHandler(this.BtnStopTraining_Click);
             // 
-            // btnFlip
+            // btnGenerateSyntheticTestData
             // 
-            this.btnFlip.Location = new System.Drawing.Point(699, 12);
-            this.btnFlip.Name = "btnFlip";
-            this.btnFlip.Size = new System.Drawing.Size(75, 23);
-            this.btnFlip.TabIndex = 26;
-            this.btnFlip.Text = "btnFlip";
-            this.btnFlip.UseVisualStyleBackColor = true;
-            this.btnFlip.Click += new System.EventHandler(this.btnFlip_Click);
-            // 
-            // btnTestData
-            // 
-            this.btnTestData.Location = new System.Drawing.Point(780, 12);
-            this.btnTestData.Name = "btnTestData";
-            this.btnTestData.Size = new System.Drawing.Size(107, 23);
-            this.btnTestData.TabIndex = 25;
-            this.btnTestData.Text = "Gen Test Data";
-            this.btnTestData.UseVisualStyleBackColor = true;
-            this.btnTestData.Click += new System.EventHandler(this.btnTestData_Click);
-            // 
-            // btnStop
-            // 
-            this.btnStop.Location = new System.Drawing.Point(237, 69);
-            this.btnStop.Name = "btnStop";
-            this.btnStop.Size = new System.Drawing.Size(110, 23);
-            this.btnStop.TabIndex = 24;
-            this.btnStop.Text = "Stop Identifying";
-            this.btnStop.UseVisualStyleBackColor = true;
-            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
-            // 
-            // btnIdentifyFloorPlans
-            // 
-            this.btnIdentifyFloorPlans.Location = new System.Drawing.Point(93, 69);
-            this.btnIdentifyFloorPlans.Name = "btnIdentifyFloorPlans";
-            this.btnIdentifyFloorPlans.Size = new System.Drawing.Size(138, 23);
-            this.btnIdentifyFloorPlans.TabIndex = 23;
-            this.btnIdentifyFloorPlans.Text = "Identify Floor Plans";
-            this.btnIdentifyFloorPlans.UseVisualStyleBackColor = true;
-            this.btnIdentifyFloorPlans.Click += new System.EventHandler(this.btnIdentifyFloorPlans_Click);
+            this.btnGenerateSyntheticTestData.Location = new System.Drawing.Point(282, 69);
+            this.btnGenerateSyntheticTestData.Name = "btnGenerateSyntheticTestData";
+            this.btnGenerateSyntheticTestData.Size = new System.Drawing.Size(152, 23);
+            this.btnGenerateSyntheticTestData.TabIndex = 25;
+            this.btnGenerateSyntheticTestData.Text = "Gen Synthetic Test Data";
+            this.btnGenerateSyntheticTestData.UseVisualStyleBackColor = true;
+            this.btnGenerateSyntheticTestData.Click += new System.EventHandler(this.BtnTestData_Click);
             // 
             // lblCost
             // 
@@ -163,7 +127,7 @@
             this.btnLoadImage.TabIndex = 21;
             this.btnLoadImage.Text = "Load Image";
             this.btnLoadImage.UseVisualStyleBackColor = true;
-            this.btnLoadImage.Click += new System.EventHandler(this.btnLoadImage_Click);
+            this.btnLoadImage.Click += new System.EventHandler(this.BtnLoadImage_Click);
             // 
             // txtInput
             // 
@@ -179,16 +143,6 @@
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(422, 23);
             this.progressBar1.TabIndex = 19;
-            // 
-            // btnSkip
-            // 
-            this.btnSkip.Location = new System.Drawing.Point(319, 156);
-            this.btnSkip.Name = "btnSkip";
-            this.btnSkip.Size = new System.Drawing.Size(91, 23);
-            this.btnSkip.TabIndex = 18;
-            this.btnSkip.Text = "Next Image";
-            this.btnSkip.UseVisualStyleBackColor = true;
-            this.btnSkip.Click += new System.EventHandler(this.btnSkip_Click);
             // 
             // txtTrainingFiles
             // 
@@ -218,7 +172,7 @@
             this.btnCreateNetwork.TabIndex = 10;
             this.btnCreateNetwork.Text = "Create Network";
             this.btnCreateNetwork.UseVisualStyleBackColor = true;
-            this.btnCreateNetwork.Click += new System.EventHandler(this.btnCreateNetwork_Click);
+            this.btnCreateNetwork.Click += new System.EventHandler(this.BtnCreateNetwork_Click);
             // 
             // btnLoadNetwork
             // 
@@ -229,7 +183,7 @@
             this.btnLoadNetwork.TabIndex = 5;
             this.btnLoadNetwork.Text = "Load Network";
             this.btnLoadNetwork.UseVisualStyleBackColor = true;
-            this.btnLoadNetwork.Click += new System.EventHandler(this.btnLoadNetwork_Click);
+            this.btnLoadNetwork.Click += new System.EventHandler(this.BtnLoadNetwork_Click);
             // 
             // btnNotFloorPlan
             // 
@@ -239,17 +193,17 @@
             this.btnNotFloorPlan.TabIndex = 9;
             this.btnNotFloorPlan.Text = "Not Floor Plan";
             this.btnNotFloorPlan.UseVisualStyleBackColor = true;
-            this.btnNotFloorPlan.Click += new System.EventHandler(this.btnNotFloorPlan_Click);
+            this.btnNotFloorPlan.Click += new System.EventHandler(this.BtnNotFloorPlan_Click);
             // 
             // btnTrain
             // 
-            this.btnTrain.Location = new System.Drawing.Point(12, 69);
+            this.btnTrain.Location = new System.Drawing.Point(12, 70);
             this.btnTrain.Name = "btnTrain";
             this.btnTrain.Size = new System.Drawing.Size(75, 23);
             this.btnTrain.TabIndex = 1;
             this.btnTrain.Text = "Train";
             this.btnTrain.UseVisualStyleBackColor = true;
-            this.btnTrain.Click += new System.EventHandler(this.btnTrain_Click);
+            this.btnTrain.Click += new System.EventHandler(this.BtnTrain_Click);
             // 
             // btnFloorPlan
             // 
@@ -259,7 +213,7 @@
             this.btnFloorPlan.TabIndex = 8;
             this.btnFloorPlan.Text = "Floor Plan";
             this.btnFloorPlan.UseVisualStyleBackColor = true;
-            this.btnFloorPlan.Click += new System.EventHandler(this.btnFloorPlan_Click);
+            this.btnFloorPlan.Click += new System.EventHandler(this.BtnFloorPlan_Click);
             // 
             // btnSaveNetwork
             // 
@@ -270,16 +224,26 @@
             this.btnSaveNetwork.TabIndex = 6;
             this.btnSaveNetwork.Text = "Save Network";
             this.btnSaveNetwork.UseVisualStyleBackColor = true;
-            this.btnSaveNetwork.Click += new System.EventHandler(this.btnSaveNetwork_Click);
+            this.btnSaveNetwork.Click += new System.EventHandler(this.BtnSaveNetwork_Click);
             // 
             // lblOutput
             // 
             this.lblOutput.AutoSize = true;
-            this.lblOutput.Location = new System.Drawing.Point(416, 160);
+            this.lblOutput.Location = new System.Drawing.Point(368, 160);
             this.lblOutput.Name = "lblOutput";
             this.lblOutput.Size = new System.Drawing.Size(66, 15);
             this.lblOutput.TabIndex = 7;
             this.lblOutput.Text = "confidence";
+            // 
+            // btnShowNormalizeImage
+            // 
+            this.btnShowNormalizeImage.Location = new System.Drawing.Point(735, 226);
+            this.btnShowNormalizeImage.Name = "btnShowNormalizeImage";
+            this.btnShowNormalizeImage.Size = new System.Drawing.Size(112, 23);
+            this.btnShowNormalizeImage.TabIndex = 27;
+            this.btnShowNormalizeImage.Text = "Normalize Image";
+            this.btnShowNormalizeImage.UseVisualStyleBackColor = true;
+            this.btnShowNormalizeImage.Click += new System.EventHandler(this.BtnShowNormalizeImage_Click);
             // 
             // txtGenInputs
             // 
@@ -301,13 +265,13 @@
             this.btnGenerateClassifier.TabIndex = 13;
             this.btnGenerateClassifier.Text = "Generate Classifier HTML";
             this.btnGenerateClassifier.UseVisualStyleBackColor = true;
-            this.btnGenerateClassifier.Click += new System.EventHandler(this.btnGenerateClassifier_Click);
+            this.btnGenerateClassifier.Click += new System.EventHandler(this.BtnGenerateClassifier_Click);
             // 
             // pictureBox2
             // 
             this.pictureBox2.Location = new System.Drawing.Point(735, 253);
             this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(200, 200);
+            this.pictureBox2.Size = new System.Drawing.Size(196, 196);
             this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox2.TabIndex = 14;
             this.pictureBox2.TabStop = false;
@@ -317,6 +281,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1390, 744);
+            this.Controls.Add(this.btnShowNormalizeImage);
             this.Controls.Add(this.pictureBox2);
             this.Controls.Add(this.btnGenerateClassifier);
             this.Controls.Add(this.txtGenInputs);
@@ -345,19 +310,16 @@
         private System.Windows.Forms.Label lblOutput;
         private System.Windows.Forms.TextBox txtStatus;
         private System.Windows.Forms.TextBox txtTrainingFiles;
-        private System.Windows.Forms.Button btnSkip;
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Button btnLoadImage;
         private System.Windows.Forms.TextBox txtInput;
         private System.Windows.Forms.Label lblCost;
-        private System.Windows.Forms.Button btnIdentifyFloorPlans;
         private System.Windows.Forms.TextBox txtGenInputs;
         private System.Windows.Forms.Button btnGenerateClassifier;
-        private System.Windows.Forms.Button btnStop;
-        private System.Windows.Forms.Button btnTestData;
-        private System.Windows.Forms.Button btnFlip;
-        private System.Windows.Forms.Button btnTestImage;
+        private System.Windows.Forms.Button btnGenerateSyntheticTestData;
+        private System.Windows.Forms.Button btnShowNormalizeImage;
         private System.Windows.Forms.PictureBox pictureBox2;
+        private System.Windows.Forms.Button btnStopTraining;
     }
 }
 

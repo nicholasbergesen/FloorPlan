@@ -248,8 +248,15 @@ namespace NeuralNet
 
         public static Network LoadNetwork()
         {
-            string networkString = File.ReadAllText("Network.json");
-            return JsonSerializer.Deserialize<Network>(networkString);
+            try
+            {
+                string networkString = File.ReadAllText("Network.json");
+                return JsonSerializer.Deserialize<Network>(networkString);
+            }
+            catch(IOException)
+            {
+                return null;
+            }
         }
     }
 }
