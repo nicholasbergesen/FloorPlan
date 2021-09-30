@@ -89,17 +89,18 @@ namespace FloorPlanNet
             return newImage;
         }
 
-        public static float[] Normalize(Bitmap image)
+        public static double[] Normalize(Bitmap image)
         {
-            var greyImage = MakeGreyScale(image);
-            var smallImage = ResizeImage(greyImage, 28, 28);
+            var smallImage = ResizeImage(image, 28, 28);
+            var greyImage = MakeGreyScale(smallImage);
 
-            float[] imagepixelsFlattened = new float[28 * 28];
-            for (int i = 0; i < smallImage.Width; i++)
+            double[] imagepixelsFlattened = new double[28 * 28];
+            int count = 0;
+            for (int i = 0; i < greyImage.Width; i++)
             {
-                for (int j = 0; j < smallImage.Height; j++)
+                for (int j = 0; j < greyImage.Height; j++)
                 {
-                    imagepixelsFlattened[i + j] = (float)(smallImage.GetPixel(i, j).R / 255.0);
+                    imagepixelsFlattened[count++] = (greyImage.GetPixel(i, j).R / 255.0);
                 }
             }
             return imagepixelsFlattened;

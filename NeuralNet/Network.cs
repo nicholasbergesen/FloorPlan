@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -9,49 +10,33 @@ using System.Threading.Tasks;
 
 namespace NeuralNet
 {
+    public enum Activation : byte
+    {
+        Sigmoid = 0,
+        TanH = 1,
+        Relu = 2,
+        LeakyRelu = 3
+    }
+
     [Serializable]
     public class Network
     {
-        public int[] _layers { get; set; }
-        public float[][] _neurons { get; set; }
-        public float[][] _biases { get; set; }
-        public float[][][] _weights { get; set; }
-        public int[] _activations { get; set; }
+        public int[] Layers { get; set; }
+        public Activation[] Activations { get; set; }
+        public double[][] Neurons { get; set; }
+        public double[][] Biases { get; set; }
+        public double[][][] Weights { get; set; }
 
-        private Random _r = new Random();
+        public double Cost = 0;
 
-        private float learningRate = 0.01f;
-        public float cost = 0;
+        private readonly Random _r = new Random();
+        private readonly double _learningRate = 0.0001d;
 
-        public Network(int[] layers, string[] layerActivations)
+        public Network(int[] layers, Activation[] layerActivations)
         {
-            _layers = new int[layers.Length];
-            for (int i = 0; i < layers.Length; i++)
-                _layers[i] = layers[i];
-
-            _activations = new int[layers.Length - 1];
-            for (int i = 0; i < layers.Length - 1; i++)
-            {
-                string action = layerActivations[i];
-                switch (action)
-                {
-                    case "sigmoid":
-                        _activations[i] = 0;
-                        break;
-                    case "tanh":
-                        _activations[i] = 1;
-                        break;
-                    case "relu":
-                        _activations[i] = 2;
-                        break;
-                    case "leakyrelu":
-                        _activations[i] = 3;
-                        break;
-                    default:
-                        _activations[i] = 2;
-                        break;
-                }
-            }
+            Layers = new int[layers.Length];
+            Array.Copy(layers, Layers, layers.Length);
+            Activations = layerActivations;
             InitNeurons();
             InitBiases();
             InitWeights();
@@ -61,187 +46,196 @@ namespace NeuralNet
 
         private void InitNeurons()
         {
-            List<float[]> neuronsList = new List<float[]>();
-            for (int i = 0; i < _layers.Length; i++)
+            List<double[]> neuronsList = new List<double[]>();
+            for (int i = 0; i < Layers.Length; i++)
             {
-                neuronsList.Add(new float[_layers[i]]);
+                neuronsList.Add(new double[Layers[i]]);
             }
-            _neurons = neuronsList.ToArray();
+            Neurons = neuronsList.ToArray();
         }
 
         private void InitBiases()
         {
-            List<float[]> biasList = new List<float[]>();
-            for (int i = 1; i < _layers.Length; i++)
+            List<double[]> biasList = new List<double[]>();
+            for (int i = 1; i < Layers.Length; i++)
             {
-                float[] bias = new float[_layers[i]];
-                for (int j = 0; j < _layers[i]; j++)
+                double[] bias = new double[Layers[i]];
+                for (int j = 0; j < Layers[i]; j++)
                 {
-                    bias[j] = _r.Next(-50, 50) / 100f;
+                    bias[j] = _r.Next(-50, 50) / 100d;
                 }
                 biasList.Add(bias);
             }
-            _biases = biasList.ToArray();
+            Biases = biasList.ToArray();
         }
 
         private void InitWeights()
         {
-            List<float[][]> weightsList = new List<float[][]>();
-            for (int i = 1; i < _layers.Length; i++)
+            List<double[][]> weightsList = new List<double[][]>();
+            for (int i = 1; i < Layers.Length; i++)
             {
-                List<float[]> layerWeightsList = new List<float[]>();
-                int neuronsInPreviousLayer = _layers[i - 1];
-                for (int j = 0; j < _layers[i]; j++)
+                List<double[]> layerWeightsList = new List<double[]>();
+                int neuronsInPreviousLayer = Layers[i - 1];
+                for (int j = 0; j < Layers[i]; j++)
                 {
-                    float[] neuronWeights = new float[neuronsInPreviousLayer];
+                    double[] neuronWeights = new double[neuronsInPreviousLayer];
                     for (int k = 0; k < neuronsInPreviousLayer; k++)
                     {
-                        neuronWeights[k] = _r.Next(-50, 50) / 100f;
+                        neuronWeights[k] = _r.Next(-50, 50) / 100d;
                     }
                     layerWeightsList.Add(neuronWeights);
                 }
                 weightsList.Add(layerWeightsList.ToArray());
             }
-            _weights = weightsList.ToArray();
+            Weights = weightsList.ToArray();
         }
 
-        public float[] FeedForward(float[] inputs)
+        public double[] FeedForward(double[] inputs)
         {
+            //populate input layer
             for (int i = 0; i < inputs.Length; i++)
             {
-                _neurons[0][i] = inputs[i];
+                Neurons[0][i] = inputs[i];
             }
-            for (int i = 1; i < _layers.Length; i++)
+
+            //move values through the network
+            for (int i = 1; i < Layers.Length; i++)
             {
-                int layer = i - 1;
-                for (int j = 0; j < _layers[i]; j++)
+                int preLayer = i - 1;
+                for (int j = 0; j < Layers[i]; j++)
                 {
-                    float value = 0f;
-                    for (int k = 0; k < _layers[i - 1]; k++)
+                    double value = 0d;
+                    for (int k = 0; k < Layers[preLayer]; k++)
                     {
-                        value += _weights[i - 1][j][k] * _neurons[i - 1][k];
+                        value += Weights[preLayer][j][k] * Neurons[preLayer][k];
                     }
-                    _neurons[i][j] = activate(value + _biases[i - 1][j], layer);
+                    Neurons[i][j] = Activate(value + Biases[preLayer][j], preLayer);
                 }
             }
-            return _neurons[_layers.Length - 1];
+            return Neurons[Layers.Length - 1];
         }
 
-        private float activate(float value, int layer)
+        private double Activate(double value, int layer)
         {
-            switch (_activations[layer])
+            return Activations[layer] switch
             {
-                case 0:
-                    return sigmoid(value);
-                case 1:
-                    return tanh(value);
-                case 2:
-                    return relu(value);
-                case 3:
-                    return leakyrelu(value);
-                default:
-                    return relu(value);
-            }
+                Activation.Sigmoid => Sigmoid(value),
+                Activation.TanH => Tanh(value),
+                Activation.Relu => Relu(value),
+                Activation.LeakyRelu => LeakyRelu(value),
+                _ => Relu(value)
+            };
         }
-        private float activateDer(float value, int layer)
+        private double ActivateDer(double value, int layer)
         {
-            switch (_activations[layer])
+            return Activations[layer] switch
             {
-                case 0:
-                    return sigmoidDer(value);
-                case 1:
-                    return tanhDer(value);
-                case 2:
-                    return reluDer(value);
-                case 3:
-                    return leakyreluDer(value);
-                default:
-                    return reluDer(value);
-            }
+                Activation.Sigmoid => SigmoidDer(value),
+                Activation.TanH => TanhDer(value),
+                Activation.Relu => ReluDer(value),
+                Activation.LeakyRelu => LeakyreluDer(value),
+                _ => ReluDer(value)
+            };
         }
 
-        private float sigmoid(float x)
+        private double Sigmoid(double x)
         {
-            float k = (float)Math.Exp(x);
-            return k / (1.0f + k);
+            double k = Math.Exp(x);
+            return k / (1.0d + k);
         }
-        private float tanh(float x)
+        private double Tanh(double x)
         {
-            return (float)Math.Tanh(x);
+            return (double)Math.Tanh(x);
         }
-        private float relu(float x)
+        private double Relu(double x)
         {
             return (0 >= x) ? 0 : x;
         }
-        private float leakyrelu(float x)
+        private double LeakyRelu(double x)
         {
-            return (0 >= x) ? 0.01f * x : x;
+            return (0 >= x) ? 0.01d * x : x;
         }
-        private float sigmoidDer(float x)
+        private double SigmoidDer(double x)
         {
             return x * (1 - x);
         }
-        private float tanhDer(float x)
+        private double TanhDer(double x)
         {
             return 1 - (x * x);
         }
-        private float reluDer(float x)
+        private double ReluDer(double x)
         {
             return (0 >= x) ? 0 : 1;
         }
-        private float leakyreluDer(float x)
+        private double LeakyreluDer(double x)
         {
-            return (0 >= x) ? 0.01f : 1;
+            return (0 >= x) ? 0.01d : 1;
         }
 
-        public void BackPropagate(float[] inputs, float[] expected)
+        public void BackPropagate(double[] inputs, double[] expected)
         {
-            float[] output = FeedForward(inputs);//runs feed forward to ensure neurons are populated correctly
+            //run feed forward to ensure neurons are populated correctly
+            double[] output = FeedForward(inputs);
 
-            cost = 0;
-            for (int i = 0; i < output.Length; i++) cost += (float)Math.Pow(output[i] - expected[i], 2);
-            cost = cost / 2;//this value is not used in calculions, rather used to identify the performance of the network
+            //Cost is not used in calculions, its used to identify the performance of the network
+            Cost = 0;
+            for (int i = 0; i < output.Length; i++) 
+                Cost += Math.Pow(output[i] - expected[i], 2);
 
-            float[][] gamma;
 
-
-            List<float[]> gammaList = new List<float[]>();
-            for (int i = 0; i < _layers.Length; i++)
+            //gamma initialization
+            //gamma is the value used to update the network and bring it inline with expected output.
+            double[][] gamma;
+            List<double[]> gammaList = new List<double[]>();
+            for (int i = 0; i < Layers.Length; i++)
             {
-                gammaList.Add(new float[_layers[i]]);
+                gammaList.Add(new double[Layers[i]]);
             }
-            gamma = gammaList.ToArray();//gamma initialization
+            gamma = gammaList.ToArray();
 
-            int layer = _layers.Length - 2;
-            for (int i = 0; i < output.Length; i++) gamma[_layers.Length - 1][i] = (output[i] - expected[i]) * activateDer(output[i], layer);//Gamma calculation
-            for (int i = 0; i < _layers[_layers.Length - 1]; i++)//calculates the w' and b' for the last layer in the network
+
+            int lastHiddenLayerIndex = Layers.Length - 2; //last hidden layer
+            int outputLayerIndex = Layers.Length - 1; //last node (output node)
+
+            //Loop of 1 since I only have 1 output
+            for (int i = 0; i < output.Length; i++)
+                gamma[outputLayerIndex][i] = (output[i] - expected[i]) * ActivateDer(output[i], lastHiddenLayerIndex);//Gamma calculation
+
+            //calculates the w' and b' for the last hidden layer in the network
+            for (int i = 0; i < Layers[^1]; i++)
             {
-                _biases[_layers.Length - 2][i] -= gamma[_layers.Length - 1][i] * learningRate;
-                for (int j = 0; j < _layers[_layers.Length - 2]; j++)
+                Biases[lastHiddenLayerIndex][i] -= gamma[outputLayerIndex][i] * _learningRate;
+                for (int j = 0; j < Layers[lastHiddenLayerIndex]; j++)
                 {
-
-                    _weights[_layers.Length - 2][i][j] -= gamma[_layers.Length - 1][i] * _neurons[_layers.Length - 2][j] * learningRate;//*learning 
+                    Weights[lastHiddenLayerIndex][i][j] -= gamma[outputLayerIndex][i] * Neurons[lastHiddenLayerIndex][j] * _learningRate;//*learning 
                 }
             }
 
-            for (int i = _layers.Length - 2; i > 0; i--)//runs on all hidden layers
+
+            //update w' and b' for hidden layers, from back to front
+            for (int i = lastHiddenLayerIndex; i > 0; i--)
             {
-                layer = i - 1;
-                for (int j = 0; j < _layers[i]; j++)//outputs
+                int preLayer = i - 1;
+                //calculate gamma for layer
+                for (int j = 0; j < Layers[i]; j++)
                 {
                     gamma[i][j] = 0;
                     for (int k = 0; k < gamma[i + 1].Length; k++)
                     {
-                        gamma[i][j] = gamma[i + 1][k] * _weights[i][k][j];
+                        gamma[i][j] = gamma[i + 1][k] * Weights[i][k][j];
                     }
-                    gamma[i][j] *= activateDer(_neurons[i][j], layer);//calculate gamma
+
+                    gamma[i][j] *= ActivateDer(Neurons[i][j], preLayer);
                 }
-                for (int j = 0; j < _layers[i]; j++)//itterate over outputs of layer
+
+                //apply gamma changes to w' and b' for layer.
+                for (int j = 0; j < Layers[i]; j++)
                 {
-                    _biases[i - 1][j] -= gamma[i][j] * learningRate;//modify biases of network
-                    for (int k = 0; k < _layers[i - 1]; k++)//itterate over inputs to layer
+                    //learning rate determined how large each update is.
+                    Biases[preLayer][j] -= gamma[i][j] * _learningRate;
+                    for (int k = 0; k < Layers[preLayer]; k++)
                     {
-                        _weights[i - 1][j][k] -= gamma[i][j] * _neurons[i - 1][k] * learningRate;//modify weights of network
+                        Weights[preLayer][j][k] -= gamma[i][j] * Neurons[preLayer][k] * _learningRate;
                     }
                 }
             }

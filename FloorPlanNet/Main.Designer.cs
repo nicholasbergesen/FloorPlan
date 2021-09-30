@@ -196,7 +196,7 @@
             this.txtTrainingFiles.Name = "txtTrainingFiles";
             this.txtTrainingFiles.Size = new System.Drawing.Size(422, 23);
             this.txtTrainingFiles.TabIndex = 17;
-            this.txtTrainingFiles.Text = "C:\\working\\FloorPlan\\FloorPlanNet\\TrainingData";
+            this.txtTrainingFiles.Text = "C:\\working\\floor-plan\\FloorPlanNet\\TrainingData\\";
             // 
             // txtStatus
             // 
@@ -305,10 +305,10 @@
             // 
             // pictureBox2
             // 
-            this.pictureBox2.Location = new System.Drawing.Point(754, 197);
+            this.pictureBox2.Location = new System.Drawing.Point(735, 253);
             this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(110, 66);
-            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBox2.Size = new System.Drawing.Size(200, 200);
+            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox2.TabIndex = 14;
             this.pictureBox2.TabStop = false;
             // 

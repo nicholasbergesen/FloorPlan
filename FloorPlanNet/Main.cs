@@ -20,7 +20,6 @@ namespace FloorPlanNet
 {
     public partial class Main : Form
     {
-        private const string NetworkFiles = "NetworkFiles";
         private const string FloorPlan = "FloorPlan";
         private const string NotFloorPlan = "NotFloorPlan";
 
@@ -35,6 +34,7 @@ namespace FloorPlanNet
         {
             List<Training> shuffledList = new List<Training>();
             shuffledList.AddRange(floorPlans.Select(x => new Training(x, 1)));
+            //shuffledList.AddRange(floorPlans.Select(x => new Training(x, 0)));
             shuffledList.AddRange(notfloorPlans.Select(x => new Training(x, 0)));
             Random rng = new Random();
 
@@ -54,17 +54,17 @@ namespace FloorPlanNet
         private struct Training
         {
             public string File;
-            public float[] Expected;
-            public Training(string file, float expectedOutput)
+            public double[] Expected;
+            public Training(string file, double expectedOutput)
             {
                 File = file;
-                Expected = new float[1] { expectedOutput };
+                Expected = new double[1] { expectedOutput };
             }
         }
 
         private void btnTrain_Click(object sender, EventArgs e)
         {
-            float totalCost = 0;
+            double totalCost = 0;
             btnTrain.Enabled = false;
 
             Status($"Loading Files...");
@@ -85,14 +85,24 @@ namespace FloorPlanNet
                 int count = 0;
                 foreach (var data in trainingdata)
                 {
-                    var originalImage = new Bitmap(data.File);
+                    Bitmap originalImage;
+                    //if (data.Expected[0] == 0)
+                    //{
+                    //    var streamInput = client.GetStreamAsync("https://picsum.photos/200/200").Result;
+                    //    originalImage = new Bitmap(streamInput);
+                    //}
+                    //else
+                    //{
+                    //    originalImage = new Bitmap(data.File);
+                    //}
+                    originalImage = new Bitmap(data.File);
                     var trainingImage = ImageProcessor.Normalize(originalImage);
                     _curnetwork.BackPropagate(trainingImage, data.Expected);
                     progressBar1.Invoke((MethodInvoker)delegate
                     {
                         progressBar1.PerformStep();
-                        totalCost += _curnetwork.cost;
-                        Status($"Avg Cost: {totalCost / ++count}");
+                        totalCost += _curnetwork.Cost;
+                        Status($"Cost: {totalCost / ++count:0.####}");
                     });
                 }
 
@@ -111,22 +121,22 @@ namespace FloorPlanNet
 
         private void btnFloorPlan_Click(object sender, EventArgs e)
         {
-            _curnetwork.BackPropagate(curImageInput, new float[1] { 1 });
-            lblCost.Text = _curnetwork.cost.ToString();
+            _curnetwork.BackPropagate(curImageInput, new double[1] { 1 });
+            lblCost.Text = _curnetwork.Cost.ToString();
         }
 
         private void btnNotFloorPlan_Click(object sender, EventArgs e)
         {
-            _curnetwork.BackPropagate(curImageInput, new float[1] { 0 });
-            lblCost.Text = _curnetwork.cost.ToString();
+            _curnetwork.BackPropagate(curImageInput, new double[1] { 0 });
+            lblCost.Text = _curnetwork.Cost.ToString();
         }
 
         private void btnCreateNetwork_Click(object sender, EventArgs e)
         {
             int[] layers = new int[4] { 784, 49, 16, 1 };
-            string[] activation = new string[3] { "leakyrelu", "leakyrelu", "leakyrelu" };
+            Activation[] activation = new Activation[3] { Activation.LeakyRelu, Activation.LeakyRelu, Activation.LeakyRelu };
             _curnetwork = new Network(layers, activation);
-            Status("Netork Created");
+            Status("Network  Created");
         }
 
         private void btnLoadNetwork_Click(object sender, EventArgs e)
@@ -134,7 +144,7 @@ namespace FloorPlanNet
             try
             {
                 _curnetwork = Network.LoadNetwork();
-                Status("Netork loaded");
+                Status("Network  loaded");
             }
             catch (Exception ex)
             {
@@ -145,17 +155,17 @@ namespace FloorPlanNet
         private void btnSaveNetwork_Click(object sender, EventArgs e)
         {
             Network.SaveNetwork(_curnetwork);
-            Status("Netork saved");
+            Status("Network  saved");
         }
 
         private void Status(string status)
         {
             var now = DateTime.Now;
-            txtStatus.AppendText($"[{now.ToShortDateString()} {now.ToShortTimeString()}] {status}{Environment.NewLine}");
+            txtStatus.AppendText($"[{now}] {status}{Environment.NewLine}");
         }
 
         HttpClient client = new HttpClient();
-        float[] curImageInput;
+        double[] curImageInput;
         private async void btnLoadImage_Click(object sender, EventArgs e)
         {
             try
@@ -320,7 +330,7 @@ namespace FloorPlanNet
             await selectReader.CloseAsync();
         }
 
-        private async Task SaveConfidence(int imageId, float confidence)
+        private async Task SaveConfidence(int imageId, double confidence)
         {
             using SqlConnection conn = new SqlConnection("Data Source=.;Initial Catalog=FloorPlan;Integrated Security=true");
             await conn.OpenAsync();
@@ -390,7 +400,7 @@ namespace FloorPlanNet
 
         private void btnFlip_Click(object sender, EventArgs e)
         {
-            var floorPlans = Directory.GetFiles(Path.Combine(txtTrainingFiles.Text, FloorPlan), "*.*", SearchOption.TopDirectoryOnly);
+            var floorPlans = Directory.GetFiles(Path.Combine(txtTrainingFiles.Text, NotFloorPlan), "*.*", SearchOption.TopDirectoryOnly);
             foreach (var data in floorPlans)
             {
                 //var originalImage = new Bitmap(floorPlans[0]);
@@ -398,8 +408,8 @@ namespace FloorPlanNet
                 //pictureBox1.Image = ImageProcessor.ChangeWhite(originalImage);
                 
                 var img = Image.FromFile(data);
-                img.RotateFlip(RotateFlipType.Rotate90FlipNone);
-                var imgPath = Path.Combine(txtTrainingFiles.Text, FloorPlan, "Flip270", new FileInfo(data).Name);
+                img.RotateFlip(RotateFlipType.RotateNoneFlipXY);
+                var imgPath = Path.Combine(txtTrainingFiles.Text, NotFloorPlan, "Not_FlipXY", new FileInfo(data).Name);
                 img.Save(imgPath, ImageFormat.Jpeg);
             }
         }

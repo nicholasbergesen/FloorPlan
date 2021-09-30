@@ -25,3 +25,13 @@ C:\working\FloorPlan\NeuralNet\obj\Debug\netcoreapp3.1\NeuralNet.AssemblyInfo.cs
 C:\working\FloorPlan\NeuralNet\obj\Debug\netcoreapp3.1\NeuralNet.csproj.CoreCompileInputs.cache
 C:\working\FloorPlan\NeuralNet\obj\Debug\netcoreapp3.1\NeuralNet.dll
 C:\working\FloorPlan\NeuralNet\obj\Debug\netcoreapp3.1\NeuralNet.pdb
+C:\working\floor-plan\NeuralNet\bin\Debug\netcoreapp3.1\NeuralNet.deps.json
+C:\working\floor-plan\NeuralNet\bin\Debug\netcoreapp3.1\NeuralNet.dll
+C:\working\floor-plan\NeuralNet\bin\Debug\netcoreapp3.1\NeuralNet.pdb
+C:\working\floor-plan\NeuralNet\obj\Debug\netcoreapp3.1\NeuralNet.GeneratedMSBuildEditorConfig.editorconfig
+C:\working\floor-plan\NeuralNet\obj\Debug\netcoreapp3.1\NeuralNet.AssemblyInfoInputs.cache
+C:\working\floor-plan\NeuralNet\obj\Debug\netcoreapp3.1\NeuralNet.AssemblyInfo.cs
+C:\working\floor-plan\NeuralNet\obj\Debug\netcoreapp3.1\NeuralNet.csproj.CoreCompileInputs.cache
+C:\working\floor-plan\NeuralNet\obj\Debug\netcoreapp3.1\NeuralNet.dll
+C:\working\floor-plan\NeuralNet\obj\Debug\netcoreapp3.1\NeuralNet.pdb
+C:\working\floor-plan\NeuralNet\obj\Debug\netcoreapp3.1\NeuralNet.csproj.AssemblyReference.cache
